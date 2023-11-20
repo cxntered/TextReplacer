@@ -1,5 +1,6 @@
 package dev.cxntered.textreplacer
 
+import cc.polyfrost.oneconfig.renderer.asset.SVG
 import cc.polyfrost.oneconfig.utils.commands.CommandManager
 import dev.cxntered.textreplacer.command.TextReplacerCommand
 import dev.cxntered.textreplacer.config.TextReplacerConfig
@@ -16,6 +17,9 @@ object TextReplacer {
     const val MODID = "@ID@"
     const val NAME = "@NAME@"
     const val VERSION = "@VER@"
+
+    val PLUS_ICON = SVG("/assets/textreplacer/icons/plus.svg")
+    val MINUS_ICON = SVG("/assets/textreplacer/icons/minus.svg")
 
     @Mod.EventHandler
     fun onInit(event: FMLInitializationEvent?) {

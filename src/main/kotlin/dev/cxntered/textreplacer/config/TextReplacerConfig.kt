@@ -1,13 +1,16 @@
 package dev.cxntered.textreplacer.config
 
 import cc.polyfrost.oneconfig.config.Config
-import cc.polyfrost.oneconfig.config.annotations.Dropdown
-import cc.polyfrost.oneconfig.config.annotations.Slider
-import cc.polyfrost.oneconfig.config.annotations.Switch
+import cc.polyfrost.oneconfig.config.annotations.CustomOption
+import cc.polyfrost.oneconfig.config.core.ConfigUtils
 import cc.polyfrost.oneconfig.config.data.Mod
 import cc.polyfrost.oneconfig.config.data.ModType
-import cc.polyfrost.oneconfig.config.data.OptionSize
+import cc.polyfrost.oneconfig.config.elements.BasicOption
+import cc.polyfrost.oneconfig.config.elements.OptionPage
 import dev.cxntered.textreplacer.TextReplacer
+import dev.cxntered.textreplacer.elements.ReplacerListOption
+import dev.cxntered.textreplacer.elements.WrappedReplacer
+import java.lang.reflect.Field
 
 object TextReplacerConfig : Config(
         Mod(
@@ -15,16 +18,36 @@ object TextReplacerConfig : Config(
                 ModType.UTIL_QOL
         ), "${TextReplacer.MODID}.json"
 ) {
-    @Switch(name = "Example Switch", size = OptionSize.SINGLE)
-    var exampleSwitch = false // The default value for the boolean Switch.
+    @CustomOption
+    private var entries: Array<Replacer> = emptyArray()
 
+    override fun getCustomOption(
+            field: Field,
+            annotation: CustomOption,
+            page: OptionPage,
+            mod: Mod,
+            migrate: Boolean
+    ): BasicOption {
+        val option = ReplacerListOption
+        ConfigUtils.getSubCategory(page, "General", "").options.add(option)
+        return option
+    }
 
-    @Slider(name = "Example Slider", min = 0f, max = 100f, step = 10)
-    var exampleSlider = 50f // The default value for the float Slider.
+    override fun load() {
+        super.load()
 
+        ReplacerListOption.wrappedReplacers = entries.mapTo(mutableListOf()) { replacer ->
+            WrappedReplacer(replacer)
+        }
+    }
 
-    @Dropdown(name = "Example Dropdown", options = ["Option 1", "Option 2", "Option 3", "Option 4"])
-    var exampleDropdown = 1 // Default option (in this case "Option 2")
+    override fun save() {
+        entries = ReplacerListOption.wrappedReplacers.map { wrapped ->
+            wrapped.replacer
+        }.toTypedArray()
+
+        super.save()
+    }
 
     init {
         initialize()
