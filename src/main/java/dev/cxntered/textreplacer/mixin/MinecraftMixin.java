@@ -1,4 +1,4 @@
-package org.polyfrost.example.mixin;
+package dev.cxntered.textreplacer.mixin;
 
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;

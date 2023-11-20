@@ -1,7 +1,7 @@
 @file:Suppress("UnstableApiUsage", "PropertyName")
 
-import org.polyfrost.gradle.util.noServerRunConfigs
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.polyfrost.gradle.util.noServerRunConfigs
 
 // Adds support for kotlin, and adds the Polyfrost Gradle Toolkit
 // which we use to prepare the environment.
@@ -28,7 +28,7 @@ preprocess {
     vars.put("MODERN", if (project.platform.mcMinor >= 16) 1 else 0)
 }
 
-// Replaces the variables in `ExampleMod.java` to the ones specified in `gradle.properties`.
+// Replaces the variables in `TextReplacer.kt` to the ones specified in `gradle.properties`.
 blossom {
     replaceToken("@VER@", mod_version)
     replaceToken("@NAME@", mod_name)
@@ -39,7 +39,7 @@ blossom {
 version = mod_version
 // Sets the group, make sure to change this to your own. It can be a website you own backwards or your GitHub username.
 // e.g. com.github.<your username> or com.<your domain>
-group = "org.polyfrost"
+group = "dev.cxntered"
 
 // Sets the name of the output jar (the one you put in your mods folder and send to other people)
 // It outputs all versions of the mod into the `build` directory.

@@ -2,13 +2,13 @@
   {
     "modid": "${id}",
     "name": "${name}",
-    "description": "",
+    "description": "A Forge 1.8.9 mod using OneConfig to replace any text",
     "version": "${version}",
     "mcversion": "1.8.9",
-    "url": "",
+    "url": "https://cxntered.dev",
     "updateUrl": "",
     "authorList": [
-      "Your Name"
+      "cxntered"
     ],
     "credits": "",
     "logoFile": "",
