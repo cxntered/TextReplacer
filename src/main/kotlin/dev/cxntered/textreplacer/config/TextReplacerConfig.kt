@@ -17,10 +17,10 @@ import java.awt.Toolkit
 import java.lang.reflect.Field
 
 object TextReplacerConfig : Config(
-        Mod(
-                TextReplacer.NAME,
-                ModType.UTIL_QOL
-        ), "${TextReplacer.MODID}.json"
+    Mod(
+        TextReplacer.NAME,
+        ModType.UTIL_QOL
+    ), "${TextReplacer.MODID}.json"
 ) {
     @Info(
         text = "Replacements are applied in the order they are listed!",
@@ -51,11 +51,11 @@ object TextReplacerConfig : Config(
     private var entries: Array<Replacer> = emptyArray()
 
     override fun getCustomOption(
-            field: Field,
-            annotation: CustomOption,
-            page: OptionPage,
-            mod: Mod,
-            migrate: Boolean
+        field: Field,
+        annotation: CustomOption,
+        page: OptionPage,
+        mod: Mod,
+        migrate: Boolean
     ): BasicOption {
         val option = ReplacerListOption
         ConfigUtils.getSubCategory(page, "General", "").options.add(option)

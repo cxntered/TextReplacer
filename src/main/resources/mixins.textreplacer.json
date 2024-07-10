@@ -1,14 +1,13 @@
 {
-  "compatibilityLevel": "JAVA_8",
-  "minVersion": "0.7",
-  "package": "dev.cxntered.textreplacer.mixin",
-  "refmap": "mixins.textreplacer.refmap.json",
-  "injectors": {
-    "maxShiftBy": 5
-  },
-  "mixins": [
-    "FontRendererMixin"
-  ],
-  "client": [],
-  "verbose": true
+    "compatibilityLevel": "JAVA_8",
+    "minVersion": "0.7",
+    "package": "dev.cxntered.textreplacer.mixin",
+    "refmap": "mixins.textreplacer.refmap.json",
+    "injectors": {
+        "maxShiftBy": 5
+    },
+    "mixins": [
+        "FontRendererMixin"
+    ],
+    "verbose": true
 }

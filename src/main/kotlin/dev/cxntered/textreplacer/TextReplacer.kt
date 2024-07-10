@@ -12,10 +12,10 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import org.apache.http.conn.util.InetAddressUtils
 
 @Mod(
-        modid = TextReplacer.MODID,
-        name = TextReplacer.NAME,
-        version = TextReplacer.VERSION,
-        modLanguageAdapter = "cc.polyfrost.oneconfig.utils.KotlinLanguageAdapter",
+    modid = TextReplacer.MODID,
+    name = TextReplacer.NAME,
+    version = TextReplacer.VERSION,
+    modLanguageAdapter = "cc.polyfrost.oneconfig.utils.KotlinLanguageAdapter",
 )
 object TextReplacer {
     const val MODID = "@ID@"
@@ -51,7 +51,7 @@ object TextReplacer {
         return string
     }
 
-    fun replaceVariables(input: String): String {
+    private fun replaceVariables(input: String): String {
         var string: String = input
         val mc: Minecraft = UMinecraft.getMinecraft()
 
@@ -75,6 +75,6 @@ object TextReplacer {
             string = string.replace("¶hypixelScoreboardIp", "www.hypixel.ne\uD83C\uDF82§et")
         }
 
-        return string;
+        return string
     }
 }

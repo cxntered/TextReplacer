@@ -1,18 +1,18 @@
 [
-  {
-    "modid": "${id}",
-    "name": "${name}",
-    "description": "A Forge 1.8.9 mod using OneConfig to replace any text",
-    "version": "${version}",
-    "mcversion": "1.8.9",
-    "url": "https://cxntered.dev",
-    "updateUrl": "",
-    "authorList": [
-      "cxntered"
-    ],
-    "credits": "",
-    "logoFile": "",
-    "screenshots": [],
-    "dependencies": []
-  }
+    {
+        "modid": "${id}",
+        "name": "${name}",
+        "description": "A Forge 1.8.9 mod using OneConfig to replace any text",
+        "version": "${version}",
+        "mcversion": "1.8.9",
+        "url": "https://cxntered.dev",
+        "updateUrl": "",
+        "authorList": [
+            "cxntered"
+        ],
+        "credits": "",
+        "logoFile": "",
+        "screenshots": [],
+        "dependencies": []
+    }
 ]

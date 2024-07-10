@@ -10,7 +10,8 @@ import dev.cxntered.textreplacer.config.Replacer
 
 @Suppress("UnstableAPIUsage")
 object ReplacerListOption : BasicOption(null, null, "", "", "General", "", 2), IFocusable {
-    private val addButton = BasicButton(32, 32, TextReplacer.PLUS_ICON, BasicButton.ALIGNMENT_CENTER, ColorPalette.PRIMARY)
+    private val addButton =
+        BasicButton(32, 32, TextReplacer.PLUS_ICON, BasicButton.ALIGNMENT_CENTER, ColorPalette.PRIMARY)
     var wrappedReplacers: MutableList<WrappedReplacer> = ArrayList()
     var willBeRemoved: WrappedReplacer? = null
 

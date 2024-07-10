@@ -8,9 +8,10 @@ import dev.cxntered.textreplacer.config.Replacer
 
 @Suppress("UnstableAPIUsage")
 class WrappedReplacer(
-        val replacer: Replacer
+    val replacer: Replacer
 ) {
-    private val removeButton = BasicButton(32, 32, TextReplacer.MINUS_ICON, BasicButton.ALIGNMENT_CENTER, ColorPalette.PRIMARY_DESTRUCTIVE)
+    private val removeButton =
+        BasicButton(32, 32, TextReplacer.MINUS_ICON, BasicButton.ALIGNMENT_CENTER, ColorPalette.PRIMARY_DESTRUCTIVE)
     private val checkbox = ReplacerCheckbox(replacer)
     private val textField = ReplacerTextField(replacer)
     private val replacementTextField = ReplacerReplacementTextField(replacer)
@@ -28,7 +29,8 @@ class WrappedReplacer(
         replacementTextField.draw(vg, x + 560, y, inputHandler)
     }
 
-    fun keyTyped(key: Char, keyCode: Int) = textField.isKeyTyped(key, keyCode) || replacementTextField.isKeyTyped(key, keyCode)
+    fun keyTyped(key: Char, keyCode: Int) =
+        textField.isKeyTyped(key, keyCode) || replacementTextField.isKeyTyped(key, keyCode)
 
     fun hasFocus() = textField.isToggled || replacementTextField.isToggled
 }

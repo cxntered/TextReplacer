@@ -15,7 +15,7 @@ import cc.polyfrost.oneconfig.utils.dsl.drawSVG
 import dev.cxntered.textreplacer.config.Replacer
 
 class ReplacerCheckbox(
-        private val text: Replacer
+    private val text: Replacer
 ) {
     private val colorAnimation = ColorAnimation(ColorPalette.SECONDARY)
     private var alphaAnimation: Animation = DummyAnimation(if (text.enabled) 1f else 0f)
@@ -33,20 +33,20 @@ class ReplacerCheckbox(
         val vg = VG(vgLong)
 
         vg.drawRoundedRect(
-                x, y + 4, 24, 24,
-                radius = 6,
-                color = colorAnimation.getColor(hover, pressed)
+            x, y + 4, 24, 24,
+            radius = 6,
+            color = colorAnimation.getColor(hover, pressed)
         )
         vg.drawHollowRoundedRect(
-                x, y + 4, 23.5f, 23.5f,
-                radius = 6,
-                color = Colors.GRAY_300,
-                thickness = 1
+            x, y + 4, 23.5f, 23.5f,
+            radius = 6,
+            color = Colors.GRAY_300,
+            thickness = 1
         )
         vg.drawRoundedRect(
-                x, y + 4, 24, 24,
-                radius = 6,
-                color = colorWithAlpha(Colors.PRIMARY_500)
+            x, y + 4, 24, 24,
+            radius = 6,
+            color = colorWithAlpha(Colors.PRIMARY_500)
         )
         SVGs.CHECKBOX_TICK?.let {
             vg.drawSVG(
@@ -57,10 +57,10 @@ class ReplacerCheckbox(
         }
 
         if (text.enabled && hover) vg.drawHollowRoundedRect(
-                x - 1, y + 3, 24, 24,
-                radius = 6,
-                color = Colors.PRIMARY_600,
-                thickness = 2
+            x - 1, y + 3, 24, 24,
+            radius = 6,
+            color = Colors.PRIMARY_600,
+            thickness = 2
         )
     }
 
