@@ -8,7 +8,7 @@ import dev.cxntered.textreplacer.config.Replacer
 @Suppress("UnstableAPIUsage")
 class ReplacerReplacementTextField(
     private val replacer: Replacer
-) : TextInputField(432, 32, "Replacement text", false, false, SVGs.TEXT_INPUT) {
+) : TextInputField(432, 32, "Replacement text", false, false, SVGs.TEXT_INPUT, 12F) {
 
     override fun draw(vg: Long, x: Float, y: Float, inputHandler: InputHandler) {
         input = replacer.replacementText
