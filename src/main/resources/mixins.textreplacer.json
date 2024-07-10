@@ -6,8 +6,9 @@
   "injectors": {
     "maxShiftBy": 5
   },
-  "client": [
-    "MinecraftMixin"
+  "mixins": [
+    "FontRendererMixin"
   ],
+  "client": [],
   "verbose": true
 }

@@ -4,6 +4,7 @@ import cc.polyfrost.oneconfig.renderer.asset.SVG
 import cc.polyfrost.oneconfig.utils.commands.CommandManager
 import dev.cxntered.textreplacer.command.TextReplacerCommand
 import dev.cxntered.textreplacer.config.TextReplacerConfig
+import dev.cxntered.textreplacer.elements.ReplacerListOption
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 
@@ -23,7 +24,25 @@ object TextReplacer {
 
     @Mod.EventHandler
     fun onInit(event: FMLInitializationEvent?) {
-        TextReplacerConfig
+        TextReplacerConfig.initialize()
         CommandManager.INSTANCE.registerCommand(TextReplacerCommand())
+    }
+
+    fun getString(input: String): String? {
+        var string: String? = input
+
+        for (wrapper in ReplacerListOption.wrappedReplacers) {
+            val (enabled, text, replacementText) = wrapper.replacer
+
+            if (enabled) {
+                if (text.isEmpty() || replacementText.isEmpty()) return string
+
+                if (string!!.contains(text)) {
+                    string = string.replace(text.toRegex(), replacementText)
+                }
+            }
+        }
+
+        return string
     }
 }
