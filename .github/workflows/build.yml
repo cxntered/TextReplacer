@@ -45,3 +45,9 @@ jobs:
 
       - name: Build
         run: ./gradlew build --no-daemon
+
+      - name: Upload built mod JAR
+        uses: actions/upload-artifact@v4.3.0
+        with:
+          name: mod-jar
+          path: versions/1.8.9-forge/build/libs/*.jar
