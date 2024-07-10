@@ -1,6 +1,7 @@
 package dev.cxntered.textreplacer.config
 
 import cc.polyfrost.oneconfig.config.Config
+import cc.polyfrost.oneconfig.config.annotations.Button
 import cc.polyfrost.oneconfig.config.annotations.CustomOption
 import cc.polyfrost.oneconfig.config.annotations.Info
 import cc.polyfrost.oneconfig.config.core.ConfigUtils
@@ -12,6 +13,7 @@ import cc.polyfrost.oneconfig.config.elements.OptionPage
 import dev.cxntered.textreplacer.TextReplacer
 import dev.cxntered.textreplacer.elements.ReplacerListOption
 import dev.cxntered.textreplacer.elements.WrappedReplacer
+import java.awt.Toolkit
 import java.lang.reflect.Field
 
 object TextReplacerConfig : Config(
@@ -26,6 +28,24 @@ object TextReplacerConfig : Config(
         size = 2
     )
     private var info = false
+
+    @Button(name = "Use the Section Sign (§) to use formatting codes!", text = "Copy", subcategory = "Info")
+    var copySectionSign = Runnable {
+        Toolkit.getDefaultToolkit().systemClipboard.setContents(java.awt.datatransfer.StringSelection("§"), null)
+    }
+
+    @Button(name = "Use the Pilcrow (¶) to use variables!", text = "Copy", subcategory = "Info")
+    var copyPilcrow = Runnable {
+        Toolkit.getDefaultToolkit().systemClipboard.setContents(java.awt.datatransfer.StringSelection("¶"), null)
+    }
+
+    @Info(
+        text = "Available variables: username, serverIp, serverDomain, hypixelScoreboardIp",
+        type = InfoType.INFO,
+        subcategory = "Info",
+        size = 2
+    )
+    private var info2 = false
 
     @CustomOption
     private var entries: Array<Replacer> = emptyArray()
