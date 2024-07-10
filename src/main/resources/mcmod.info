@@ -4,7 +4,7 @@
         "name": "${name}",
         "description": "A Forge 1.8.9 mod using OneConfig to replace any text",
         "version": "${version}",
-        "mcversion": "1.8.9",
+        "mcversion": "${mcVersionStr}",
         "url": "https://cxntered.dev",
         "updateUrl": "",
         "authorList": [
