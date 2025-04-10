@@ -8,6 +8,7 @@ import cc.polyfrost.oneconfig.config.core.ConfigUtils
 import cc.polyfrost.oneconfig.config.data.InfoType
 import cc.polyfrost.oneconfig.config.data.Mod
 import cc.polyfrost.oneconfig.config.data.ModType
+import cc.polyfrost.oneconfig.config.data.OptionSize
 import cc.polyfrost.oneconfig.config.elements.BasicOption
 import cc.polyfrost.oneconfig.config.elements.OptionPage
 import dev.cxntered.textreplacer.TextReplacer
@@ -19,13 +20,14 @@ import java.lang.reflect.Field
 object TextReplacerConfig : Config(
     Mod(
         TextReplacer.NAME,
-        ModType.UTIL_QOL
+        ModType.UTIL_QOL,
+        "/TextReplacer.svg"
     ), "${TextReplacer.MODID}.json"
 ) {
     @Info(
         text = "Replacements are applied in the order they are listed!",
         type = InfoType.INFO,
-        size = 2
+        size = OptionSize.DUAL
     )
     private var info = false
 
@@ -43,7 +45,7 @@ object TextReplacerConfig : Config(
         text = "Available variables: username, serverIp, serverDomain, hypixelScoreboardIp",
         type = InfoType.INFO,
         subcategory = "Info",
-        size = 2
+        size = OptionSize.DUAL
     )
     private var info2 = false
 
