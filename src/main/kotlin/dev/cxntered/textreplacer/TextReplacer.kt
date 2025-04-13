@@ -6,7 +6,6 @@ import cc.polyfrost.oneconfig.utils.commands.CommandManager
 import dev.cxntered.textreplacer.command.TextReplacerCommand
 import dev.cxntered.textreplacer.config.TextReplacerConfig
 import dev.cxntered.textreplacer.elements.ReplacerListOption
-import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import org.apache.http.conn.util.InetAddressUtils
@@ -15,7 +14,7 @@ import org.apache.http.conn.util.InetAddressUtils
     modid = TextReplacer.MODID,
     name = TextReplacer.NAME,
     version = TextReplacer.VERSION,
-    modLanguageAdapter = "cc.polyfrost.oneconfig.utils.KotlinLanguageAdapter",
+    modLanguageAdapter = "cc.polyfrost.oneconfig.utils.KotlinLanguageAdapter"
 )
 object TextReplacer {
     const val MODID = "@ID@"
@@ -26,19 +25,19 @@ object TextReplacer {
     val MINUS_ICON = SVG("/assets/textreplacer/icons/minus.svg")
 
     @Mod.EventHandler
-    fun onInit(event: FMLInitializationEvent?) {
+    fun onInit(event: FMLInitializationEvent) {
         TextReplacerConfig.initialize()
         CommandManager.INSTANCE.registerCommand(TextReplacerCommand())
     }
 
     fun getString(input: String): String {
-        var string: String = input
+        var string = input
 
         for (wrapper in ReplacerListOption.wrappedReplacers) {
-            var (enabled, text, replacementText) = wrapper.replacer
+            with (wrapper.replacer) {
+                if (!enabled) return@with
+                if (text.isEmpty() || replacementText.isEmpty()) return@with
 
-            if (enabled) {
-                if (text.isEmpty() || replacementText.isEmpty()) return string
                 text = replaceVariables(text)
                 replacementText = replaceVariables(replacementText)
 
@@ -52,8 +51,8 @@ object TextReplacer {
     }
 
     private fun replaceVariables(input: String): String {
-        var string: String = input
-        val mc: Minecraft = UMinecraft.getMinecraft()
+        var string = input
+        val mc = UMinecraft.getMinecraft()
 
         string = string.replace("¶username", mc.session.profile.name)
 

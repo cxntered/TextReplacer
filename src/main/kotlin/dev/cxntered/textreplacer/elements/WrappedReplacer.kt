@@ -13,8 +13,8 @@ class WrappedReplacer(
     private val removeButton =
         BasicButton(32, 32, TextReplacer.MINUS_ICON, BasicButton.ALIGNMENT_CENTER, ColorPalette.PRIMARY_DESTRUCTIVE)
     private val checkbox = ReplacerCheckbox(replacer)
-    private val textField = ReplacerTextField(replacer)
-    private val replacementTextField = ReplacerReplacementTextField(replacer)
+    private val textField = ReplacerTextField(replacer::text, "Text to replace")
+    private val replacementTextField = ReplacerTextField(replacer::replacementText, "Replacement text")
 
     init {
         removeButton.setClickAction {

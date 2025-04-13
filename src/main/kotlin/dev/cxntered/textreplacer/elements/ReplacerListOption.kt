@@ -47,5 +47,4 @@ object ReplacerListOption : BasicOption(null, null, "", "", "General", "", 2), I
     }
 
     override fun hasFocus() = wrappedReplacers.any { it.hasFocus() }
-
 }
