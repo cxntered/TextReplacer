@@ -1,8 +1,8 @@
 package dev.cxntered.textreplacer
 
-import cc.polyfrost.oneconfig.libs.universal.UMinecraft
 import cc.polyfrost.oneconfig.renderer.asset.SVG
 import cc.polyfrost.oneconfig.utils.commands.CommandManager
+import cc.polyfrost.oneconfig.utils.dsl.mc
 import dev.cxntered.textreplacer.command.TextReplacerCommand
 import dev.cxntered.textreplacer.config.TextReplacerConfig
 import dev.cxntered.textreplacer.elements.ReplacerListOption
@@ -30,48 +30,50 @@ object TextReplacer {
         CommandManager.INSTANCE.registerCommand(TextReplacerCommand())
     }
 
+    @JvmStatic
     fun getString(input: String): String {
         var string = input
 
         for (wrapper in ReplacerListOption.wrappedReplacers) {
-            with (wrapper.replacer) {
-                if (!enabled) return@with
-                if (text.isEmpty() || replacementText.isEmpty()) return@with
+            with(wrapper.replacer) {
+                if (!enabled || text.isEmpty() || replacementText.isEmpty()) return@with
 
-                text = replaceVariables(text)
-                replacementText = replaceVariables(replacementText)
+                if (expandedText.isEmpty())
+                    expandedText = expandText(text)
+                if (expandedReplacementText.isEmpty())
+                    expandedReplacementText = expandText(replacementText)
 
-                if (string.contains(text)) {
-                    string = string.replace(text, replacementText)
-                }
+                string = string.replace(expandedText, expandedReplacementText)
             }
         }
 
         return string
     }
 
-    private fun replaceVariables(input: String): String {
+    fun expandText(input: String): String {
+        if (input.isEmpty() || !input.contains('¶')) return input
         var string = input
-        val mc = UMinecraft.getMinecraft()
 
-        string = string.replace("¶username", mc.session.profile.name)
+        val serverIp = mc.currentServerData?.serverIP?.split(":")?.firstOrNull()
 
-        if (!mc.isSingleplayer && mc.currentServerData != null) {
-            var serverIp: String = mc.currentServerData.serverIP
-            if (serverIp.contains(":"))
-                serverIp = serverIp.split(":")[0]
-
-            string = string.replace("¶serverIp", serverIp)
-
-            if (!InetAddressUtils.isIPv4Address(serverIp) && !InetAddressUtils.isIPv6Address(serverIp)) {
-                val parts = serverIp.split(".")
-                val serverDomain = parts[parts.size - 2]
-
-                string = string.replace("¶serverDomain", serverDomain)
-            }
-
+        val variables = mapOf(
+            "¶username" to mc.session.profile.name,
+            "¶serverIp" to serverIp,
+            "¶serverDomain" to run {
+                if (serverIp != null &&
+                    !InetAddressUtils.isIPv4Address(serverIp) &&
+                    !InetAddressUtils.isIPv6Address(serverIp)
+                ) {
+                    val parts = serverIp.split(".")
+                    parts[parts.size - 2]
+                } else null
+            },
             // hypixel, for some reason, puts 🎂 in their scoreboard IP
-            string = string.replace("¶hypixelScoreboardIp", "www.hypixel.ne\uD83C\uDF82§et")
+            "¶hypixelScoreboardIp" to "www.hypixel.ne\uD83C\uDF82§et"
+        )
+
+        for ((variable, value) in variables) {
+            if (value != null) string = string.replace(variable, value.toString())
         }
 
         return string
