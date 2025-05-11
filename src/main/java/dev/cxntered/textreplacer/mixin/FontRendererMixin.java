@@ -13,13 +13,13 @@ public abstract class FontRendererMixin {
     private String textreplacer$spoofRenderString(String string) {
         if (string == null) return null;
         if (!TextReplacerConfig.INSTANCE.enabled) return string;
-        return TextReplacer.INSTANCE.getString(string);
+        return TextReplacer.getString(string);
     }
 
     @ModifyVariable(method = "getStringWidth", at = @At("HEAD"), argsOnly = true)
     private String textreplacer$spoofGetStringWidth(String string) {
         if (string == null) return null;
         if (!TextReplacerConfig.INSTANCE.enabled) return string;
-        return TextReplacer.INSTANCE.getString(string);
+        return TextReplacer.getString(string);
     }
 }

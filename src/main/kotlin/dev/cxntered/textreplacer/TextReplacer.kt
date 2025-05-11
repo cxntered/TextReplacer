@@ -1,9 +1,10 @@
 package dev.cxntered.textreplacer
 
-import cc.polyfrost.oneconfig.libs.universal.UMinecraft
 import cc.polyfrost.oneconfig.renderer.asset.SVG
 import cc.polyfrost.oneconfig.utils.commands.CommandManager
-import dev.cxntered.textreplacer.command.TextReplacerCommand
+import cc.polyfrost.oneconfig.utils.commands.annotations.Command
+import cc.polyfrost.oneconfig.utils.commands.annotations.Main
+import cc.polyfrost.oneconfig.utils.dsl.mc
 import dev.cxntered.textreplacer.config.TextReplacerConfig
 import dev.cxntered.textreplacer.elements.ReplacerListOption
 import net.minecraftforge.fml.common.Mod
@@ -24,56 +25,73 @@ object TextReplacer {
     val PLUS_ICON = SVG("/assets/textreplacer/icons/plus.svg")
     val MINUS_ICON = SVG("/assets/textreplacer/icons/minus.svg")
 
+    private var cachedUsername: String? = null
+    private var cachedServerIp: String? = null
+    private var cachedServerDomain: String? = null
+
     @Mod.EventHandler
     fun onInit(event: FMLInitializationEvent) {
         TextReplacerConfig.initialize()
         CommandManager.INSTANCE.registerCommand(TextReplacerCommand())
     }
 
+    @JvmStatic
     fun getString(input: String): String {
-        var string = input
+        var shouldExpand = false
 
-        for (wrapper in ReplacerListOption.wrappedReplacers) {
-            with (wrapper.replacer) {
-                if (!enabled) return@with
-                if (text.isEmpty() || replacementText.isEmpty()) return@with
-
-                text = replaceVariables(text)
-                replacementText = replaceVariables(replacementText)
-
-                if (string.contains(text)) {
-                    string = string.replace(text, replacementText)
-                }
-            }
+        val currentUsername = mc.session.profile.name
+        if (currentUsername != cachedUsername) {
+            cachedUsername = currentUsername
+            shouldExpand = true
         }
 
-        return string
+        val currentServerIp = mc.currentServerData?.serverIP
+        if (currentServerIp != cachedServerIp) {
+            cachedServerIp = currentServerIp
+            cachedServerDomain = currentServerIp?.let { ip ->
+                val baseAddress = ip.split(":").first()
+                baseAddress.takeIf {
+                    !InetAddressUtils.isIPv4Address(it) && !InetAddressUtils.isIPv6Address(it)
+                }?.split(".")?.dropLast(1)?.last()
+            }
+            shouldExpand = true
+        }
+
+        return ReplacerListOption.wrappedReplacers.fold(input) { string, wrapper ->
+            with(wrapper.replacer) {
+                if (!enabled || text.isEmpty() || replacementText.isEmpty()) return@with string
+
+                if (shouldExpand || expandedText.isEmpty())
+                    expandedText = expandText(text)
+                if (shouldExpand || expandedReplacementText.isEmpty())
+                    expandedReplacementText = expandText(replacementText)
+
+                string.replace(expandedText, expandedReplacementText)
+            }
+        }
     }
 
-    private fun replaceVariables(input: String): String {
-        var string = input
-        val mc = UMinecraft.getMinecraft()
+    fun expandText(input: String): String {
+        if (input.isEmpty() || !input.contains('¶')) return input
 
-        string = string.replace("¶username", mc.session.profile.name)
-
-        if (!mc.isSingleplayer && mc.currentServerData != null) {
-            var serverIp: String = mc.currentServerData.serverIP
-            if (serverIp.contains(":"))
-                serverIp = serverIp.split(":")[0]
-
-            string = string.replace("¶serverIp", serverIp)
-
-            if (!InetAddressUtils.isIPv4Address(serverIp) && !InetAddressUtils.isIPv6Address(serverIp)) {
-                val parts = serverIp.split(".")
-                val serverDomain = parts[parts.size - 2]
-
-                string = string.replace("¶serverDomain", serverDomain)
-            }
-
+        val variables = mapOf(
+            "¶username" to cachedUsername,
+            "¶serverIp" to cachedServerIp?.split(":")?.firstOrNull(),
+            "¶serverDomain" to cachedServerDomain,
             // hypixel, for some reason, puts 🎂 in their scoreboard IP
-            string = string.replace("¶hypixelScoreboardIp", "www.hypixel.ne\uD83C\uDF82§et")
-        }
+            "¶hypixelScoreboardIp" to "www.hypixel.ne\uD83C\uDF82§et"
+        )
 
-        return string
+        return variables.entries.fold(input) { text, (variable, value) ->
+            if (value != null) text.replace(variable, value.toString()) else text
+        }
+    }
+
+    @Command(value = MODID, description = "Access the $NAME GUI.")
+    class TextReplacerCommand {
+        @Main
+        fun handle() {
+            TextReplacerConfig.openGui()
+        }
     }
 }
