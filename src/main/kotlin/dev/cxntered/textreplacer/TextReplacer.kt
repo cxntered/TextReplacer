@@ -36,7 +36,6 @@ object TextReplacer {
 
     @JvmStatic
     fun getString(input: String): String {
-        var string = input
         var shouldExpand = false
 
         val currentUsername = mc.session.profile.name
@@ -57,25 +56,22 @@ object TextReplacer {
             shouldExpand = true
         }
 
-        for (wrapper in ReplacerListOption.wrappedReplacers) {
+        return ReplacerListOption.wrappedReplacers.fold(input) { string, wrapper ->
             with(wrapper.replacer) {
-                if (!enabled || text.isEmpty() || replacementText.isEmpty()) return@with
+                if (!enabled || text.isEmpty() || replacementText.isEmpty()) return@with string
 
                 if (shouldExpand || expandedText.isEmpty())
                     expandedText = expandText(text)
                 if (shouldExpand || expandedReplacementText.isEmpty())
                     expandedReplacementText = expandText(replacementText)
 
-                string = string.replace(expandedText, expandedReplacementText)
+                string.replace(expandedText, expandedReplacementText)
             }
         }
-
-        return string
     }
 
     fun expandText(input: String): String {
         if (input.isEmpty() || !input.contains('¶')) return input
-        var string = input
 
         val variables = mapOf(
             "¶username" to cachedUsername,
@@ -85,10 +81,8 @@ object TextReplacer {
             "¶hypixelScoreboardIp" to "www.hypixel.ne\uD83C\uDF82§et"
         )
 
-        for ((variable, value) in variables) {
-            if (value != null) string = string.replace(variable, value.toString())
+        return variables.entries.fold(input) { text, (variable, value) ->
+            if (value != null) text.replace(variable, value.toString()) else text
         }
-
-        return string
     }
 }
