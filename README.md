@@ -2,7 +2,7 @@
 
 # `TextReplacer`
 
-A Forge 1.8.9 mod using OneConfig to replace any text.
+A Forge 1.8.9 mod using OneConfig to visually replace any text.
 
 ---
 
