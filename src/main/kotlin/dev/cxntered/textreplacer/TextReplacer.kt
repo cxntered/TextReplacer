@@ -2,8 +2,9 @@ package dev.cxntered.textreplacer
 
 import cc.polyfrost.oneconfig.renderer.asset.SVG
 import cc.polyfrost.oneconfig.utils.commands.CommandManager
+import cc.polyfrost.oneconfig.utils.commands.annotations.Command
+import cc.polyfrost.oneconfig.utils.commands.annotations.Main
 import cc.polyfrost.oneconfig.utils.dsl.mc
-import dev.cxntered.textreplacer.command.TextReplacerCommand
 import dev.cxntered.textreplacer.config.TextReplacerConfig
 import dev.cxntered.textreplacer.elements.ReplacerListOption
 import net.minecraftforge.fml.common.Mod
@@ -83,6 +84,14 @@ object TextReplacer {
 
         return variables.entries.fold(input) { text, (variable, value) ->
             if (value != null) text.replace(variable, value.toString()) else text
+        }
+    }
+
+    @Command(value = MODID, description = "Access the $NAME GUI.")
+    class TextReplacerCommand {
+        @Main
+        fun handle() {
+            TextReplacerConfig.openGui()
         }
     }
 }
