@@ -24,6 +24,10 @@ object TextReplacer {
     val PLUS_ICON = SVG("/assets/textreplacer/icons/plus.svg")
     val MINUS_ICON = SVG("/assets/textreplacer/icons/minus.svg")
 
+    private var cachedUsername: String? = null
+    private var cachedServerIp: String? = null
+    private var cachedServerDomain: String? = null
+
     @Mod.EventHandler
     fun onInit(event: FMLInitializationEvent) {
         TextReplacerConfig.initialize()
@@ -33,14 +37,33 @@ object TextReplacer {
     @JvmStatic
     fun getString(input: String): String {
         var string = input
+        var shouldExpand = false
+
+        val currentUsername = mc.session.profile.name
+        if (currentUsername != cachedUsername) {
+            cachedUsername = currentUsername
+            shouldExpand = true
+        }
+
+        val currentServerIp = mc.currentServerData?.serverIP
+        if (currentServerIp != cachedServerIp) {
+            cachedServerIp = currentServerIp
+            cachedServerDomain = currentServerIp?.let { ip ->
+                val baseAddress = ip.split(":").first()
+                baseAddress.takeIf {
+                    !InetAddressUtils.isIPv4Address(it) && !InetAddressUtils.isIPv6Address(it)
+                }?.split(".")?.dropLast(1)?.last()
+            }
+            shouldExpand = true
+        }
 
         for (wrapper in ReplacerListOption.wrappedReplacers) {
             with(wrapper.replacer) {
                 if (!enabled || text.isEmpty() || replacementText.isEmpty()) return@with
 
-                if (expandedText.isEmpty())
+                if (shouldExpand || expandedText.isEmpty())
                     expandedText = expandText(text)
-                if (expandedReplacementText.isEmpty())
+                if (shouldExpand || expandedReplacementText.isEmpty())
                     expandedReplacementText = expandText(replacementText)
 
                 string = string.replace(expandedText, expandedReplacementText)
@@ -54,20 +77,10 @@ object TextReplacer {
         if (input.isEmpty() || !input.contains('¶')) return input
         var string = input
 
-        val serverIp = mc.currentServerData?.serverIP?.split(":")?.firstOrNull()
-
         val variables = mapOf(
-            "¶username" to mc.session.profile.name,
-            "¶serverIp" to serverIp,
-            "¶serverDomain" to run {
-                if (serverIp != null &&
-                    !InetAddressUtils.isIPv4Address(serverIp) &&
-                    !InetAddressUtils.isIPv6Address(serverIp)
-                ) {
-                    val parts = serverIp.split(".")
-                    parts[parts.size - 2]
-                } else null
-            },
+            "¶username" to cachedUsername,
+            "¶serverIp" to cachedServerIp?.split(":")?.firstOrNull(),
+            "¶serverDomain" to cachedServerDomain,
             // hypixel, for some reason, puts 🎂 in their scoreboard IP
             "¶hypixelScoreboardIp" to "www.hypixel.ne\uD83C\uDF82§et"
         )
