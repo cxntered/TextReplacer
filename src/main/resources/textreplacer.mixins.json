@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "dev.cxntered.textreplacer.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"TextRendererMixin",
+		"ChatMessagesMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
