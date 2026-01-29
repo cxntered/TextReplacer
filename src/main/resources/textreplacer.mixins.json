@@ -3,8 +3,8 @@
 	"package": "dev.cxntered.textreplacer.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"TextRendererMixin",
-		"ChatMessagesMixin"
+		"FontMixin",
+		"ComponentRenderUtilsMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

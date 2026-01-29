@@ -4,6 +4,9 @@
  * Licensed under the European Union Public Licence v1.2 (EUPL v1.2).
  * Original source: https://github.com/sisby-folk/mcqoy/blob/44e2494/src/main/java/dev/sisby/mcqoy/yacl/MapKeyOption.java
  *
+ * Modifications by cxntered, 2026:
+ *   - Migrated to use Mojang's mappings.
+ *
  * In accordance with the compatibility clause of the EUPL v1.2,
  * this file is redistributed under the GNU General Public License v3 (GPLv3).
  * See the LICENSE file in the project root for details.
@@ -15,7 +18,7 @@ import com.google.common.collect.ImmutableSet;
 import dev.isxander.yacl3.api.*;
 import dev.isxander.yacl3.api.controller.ControllerBuilder;
 import dev.isxander.yacl3.impl.ProvidesBindingForDeprecation;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.Validate;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,8 +45,8 @@ public class MapKeyOption<T> implements Option<String> {
     }
 
     @Override
-    public @NotNull Text name() {
-        return Text.empty();
+    public @NotNull Component name() {
+        return Component.empty();
     }
 
     @Override
@@ -52,7 +55,7 @@ public class MapKeyOption<T> implements Option<String> {
     }
 
     @Override
-    public @NotNull Text tooltip() {
+    public @NotNull Component tooltip() {
         return mapOption.tooltip();
     }
 

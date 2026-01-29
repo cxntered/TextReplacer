@@ -1,13 +1,12 @@
 package dev.cxntered.textreplacer
 
 import dev.cxntered.textreplacer.config.ModConfig
-import dev.cxntered.textreplacer.text.replaceString
 import net.fabricmc.api.ModInitializer
-import net.minecraft.client.MinecraftClient
-import net.minecraft.text.Text
-import org.apache.http.conn.util.InetAddressUtils
+import net.minecraft.client.Minecraft
 
 object TextReplacer : ModInitializer {
+    private val IP_REGEX = Regex("^[0-9.:]+$")
+
     private var expandedReplacements = mutableMapOf<String, String>()
     private var cachedUsername: String? = null
     private var cachedServerIp: String? = null
@@ -17,42 +16,37 @@ object TextReplacer : ModInitializer {
         ModConfig.CONFIG.load()
     }
 
-    @JvmStatic
-    fun getReplacedText(input: Text): Text {
-        var text = input
-        processReplacements { target, replacement ->
-            text = text.replaceString(target, replacement)
-        }
-        return text
-    }
-
-    @JvmStatic
-    fun getReplacedString(input: String): String {
-        var text = input
-        processReplacements { target, replacement ->
-            text = text.replace(target, replacement)
-        }
-        return text
-    }
+//    @JvmStatic
+//    fun getReplacedText(input: Text): Text {
+//        var text = input
+//        processReplacements { target, replacement ->
+//            text = text.replaceString(target, replacement)
+//        }
+//        return text
+//    }
+//
+//    @JvmStatic
+//    fun getReplacedString(input: String): String {
+//        var text = input
+//        processReplacements { target, replacement ->
+//            text = text.replace(target, replacement)
+//        }
+//        return text
+//    }
 
     private fun processReplacements(replaceText: (String, String) -> Unit) {
         var shouldExpand = false
 
-        val currentUsername = MinecraftClient.getInstance().session.username
+        val currentUsername = Minecraft.getInstance().user.name
         if (currentUsername != cachedUsername) {
             cachedUsername = currentUsername
             shouldExpand = true
         }
 
-        val currentServerIp = MinecraftClient.getInstance().currentServerEntry?.address
+        val currentServerIp = Minecraft.getInstance().currentServer?.ip
         if (currentServerIp != cachedServerIp) {
             cachedServerIp = currentServerIp
-            cachedServerDomain = currentServerIp?.let { ip ->
-                val baseAddress = ip.split(":").first()
-                baseAddress.takeIf {
-                    !InetAddressUtils.isIPv4Address(it) && !InetAddressUtils.isIPv6Address(it)
-                }?.split(".")?.dropLast(1)?.last()
-            }
+            cachedServerDomain = extractServerDomain(currentServerIp)
             shouldExpand = true
         }
 
@@ -83,5 +77,16 @@ object TextReplacer : ModInitializer {
         return variables.entries.fold(input) { text, (variable, value) ->
             if (value != null) text.replace(variable, value) else text
         }
+    }
+
+    private fun extractServerDomain(serverIp: String?): String? {
+        if (serverIp == null) return null
+
+        val baseAddress = serverIp.split(":").first()
+
+        if (baseAddress.matches(IP_REGEX)) return null
+
+        val parts = baseAddress.split(".")
+        return if (parts.size >= 2) parts[parts.size - 2] else null
     }
 }

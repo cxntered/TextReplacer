@@ -8,10 +8,10 @@ import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import dev.isxander.yacl3.platform.YACLPlatform;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -31,49 +31,49 @@ public class ModConfig {
 
     public static Screen configScreen(Screen parent) {
         return YetAnotherConfigLib.create(CONFIG, ((defaults, config, builder) -> builder
-                .title(Text.literal("TextReplacer"))
+                .title(Component.literal("TextReplacer"))
                 .category(ConfigCategory.createBuilder()
-                        .name(Text.literal("Settings"))
+                        .name(Component.literal("Settings"))
                         .option(Option.<Boolean>createBuilder()
-                                .name(Text.literal("Enabled"))
-                                .description(OptionDescription.of(Text.literal("Enable or disable the mod.")))
+                                .name(Component.literal("Enabled"))
+                                .description(OptionDescription.of(Component.literal("Enable or disable the mod.")))
                                 .binding(defaults.enabled, () -> config.enabled, newVal -> config.enabled = newVal)
                                 .controller(opt -> BooleanControllerBuilder.create(opt).coloured(true))
                                 .build())
                         .group(OptionGroup.createBuilder()
-                                .name(Text.literal("Information"))
+                                .name(Component.literal("Information"))
                                 .option(LabelOption.create(
-                                        Text.empty()
-                                                .append(Text.literal("ⓘ ").formatted(Formatting.BLUE, Formatting.BOLD))
-                                                .append(Text.literal("Replacements are applied in the order they are listed!").formatted(Formatting.BLUE))
+                                        Component.empty()
+                                                .append(Component.literal("ⓘ ").withStyle(ChatFormatting.BLUE, ChatFormatting.BOLD))
+                                                .append(Component.literal("Replacements are applied in the order they are listed!").withStyle(ChatFormatting.BLUE))
                                 ))
                                 .option(ButtonOption.createBuilder()
-                                        .name(Text.literal("Copy Section Sign"))
+                                        .name(Component.literal("Copy Section Sign"))
                                         .description(OptionDescription.of(
-                                                Text.literal("Use the section sign to use formatting codes.")))
+                                                Component.literal("Use the section sign to use formatting codes.")))
                                         .action((screen, opt) -> {
-                                            MinecraftClient.getInstance().keyboard.setClipboard("§");
+                                            Minecraft.getInstance().keyboardHandler.setClipboard("§");
                                         })
-                                        .text(Text.literal("✎"))
+                                        .text(Component.literal("✎"))
                                         .build())
                                 .option(ButtonOption.createBuilder()
-                                        .name(Text.literal("Copy Pilcrow"))
+                                        .name(Component.literal("Copy Pilcrow"))
                                         .description(OptionDescription.of(
-                                                Text.literal("Use the pilcrow to use variables.")
-                                                        .append(Text.literal("\n\n"))
-                                                        .append(Text.literal("Available variables:").formatted(Formatting.BOLD))
-                                                        .append(Text.literal("\n"))
-                                                        .append(Text.literal("username, serverIp, serverDomain")))
+                                                Component.literal("Use the pilcrow to use variables.")
+                                                        .append(Component.literal("\n\n"))
+                                                        .append(Component.literal("Available variables:").withStyle(ChatFormatting.BOLD))
+                                                        .append(Component.literal("\n"))
+                                                        .append(Component.literal("username, serverIp, serverDomain")))
                                         )
                                         .action((screen, opt) -> {
-                                            MinecraftClient.getInstance().keyboard.setClipboard("¶");
+                                            Minecraft.getInstance().keyboardHandler.setClipboard("¶");
                                         })
-                                        .text(Text.literal("✎"))
+                                        .text(Component.literal("✎"))
                                         .build())
                                 .build())
                         .group(ListOption.<Map.Entry<String, String>>createBuilder()
-                                .name(Text.literal("Replacements"))
-                                .description(OptionDescription.of(Text.literal("List of text replacements to apply")))
+                                .name(Component.literal("Replacements"))
+                                .description(OptionDescription.of(Component.literal("List of text replacements to apply")))
                                 .customController(o -> new EntryController<>(
                                         o, StringControllerBuilder::create, StringControllerBuilder::create
                                 ))
@@ -85,6 +85,7 @@ public class ModConfig {
                                             }
                                         })
                                 .initial(new AbstractMap.SimpleEntry<>("", ""))
+                                .insertEntriesAtEnd(true)
                                 .build())
                         .build())
         )).generateScreen(parent);

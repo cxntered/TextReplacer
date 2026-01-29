@@ -4,6 +4,9 @@
  * Licensed under the European Union Public Licence v1.2 (EUPL v1.2).
  * Original source: https://github.com/sisby-folk/mcqoy/blob/44e2494/src/main/java/dev/sisby/mcqoy/yacl/EntryController.java
  *
+ * Modifications by cxntered, 2026:
+ *   - Migrated to use Mojang's mappings.
+ *
  * In accordance with the compatibility clause of the EUPL v1.2,
  * this file is redistributed under the GNU General Public License v3 (GPLv3).
  * See the LICENSE file in the project root for details.
@@ -17,7 +20,7 @@ import dev.isxander.yacl3.api.controller.ControllerBuilder;
 import dev.isxander.yacl3.api.utils.Dimension;
 import dev.isxander.yacl3.gui.AbstractWidget;
 import dev.isxander.yacl3.gui.YACLScreen;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -40,8 +43,8 @@ public class EntryController<T> implements Controller<Map.Entry<String, T>> {
     }
 
     @Override
-    public Text formatValue() {
-        return Text.literal(option.pendingValue().toString());
+    public Component formatValue() {
+        return Component.literal(option.pendingValue().toString());
     }
 
     @Override
