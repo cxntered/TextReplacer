@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "${description}",
+  "authors": [
+    "cxntered"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/${id}",
+    "sources": "https://github.com/cxntered/${name}",
+    "issues": "https://github.com/cxntered/${name}/issues"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/${id}"
+      }
+    }
+  },
+  "license": "GPL-3.0-or-later",
+  "icon": "assets/textreplacer/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "dev.cxntered.textreplacer.TextReplacer"
+    ]
+  },
+  "mixins": [
+    "${id}.mixins.json"
+  ],
+  "depends": {
+    "minecraft": "${minecraft}",
+    "fabricloader": ">=0.17.0",
+    "oneconfigv1": "${oneconfig}"
+  }
+}

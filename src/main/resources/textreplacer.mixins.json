@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "dev.cxntered.textreplacer.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "TextRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

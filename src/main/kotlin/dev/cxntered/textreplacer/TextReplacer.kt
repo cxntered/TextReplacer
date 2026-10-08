@@ -1,97 +1,69 @@
 package dev.cxntered.textreplacer
 
-import cc.polyfrost.oneconfig.renderer.asset.SVG
-import cc.polyfrost.oneconfig.utils.commands.CommandManager
-import cc.polyfrost.oneconfig.utils.commands.annotations.Command
-import cc.polyfrost.oneconfig.utils.commands.annotations.Main
-import cc.polyfrost.oneconfig.utils.dsl.mc
-import dev.cxntered.textreplacer.config.TextReplacerConfig
-import dev.cxntered.textreplacer.elements.ReplacerListOption
-import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import dev.cxntered.textreplacer.config.ModConfig
+import net.fabricmc.api.ModInitializer
+import net.minecraft.client.MinecraftClient
 import org.apache.http.conn.util.InetAddressUtils
 
-@Mod(
-    modid = TextReplacer.MODID,
-    name = TextReplacer.NAME,
-    version = TextReplacer.VERSION,
-    modLanguageAdapter = "cc.polyfrost.oneconfig.utils.KotlinLanguageAdapter"
-)
-object TextReplacer {
-    const val MODID = "@ID@"
-    const val NAME = "@NAME@"
-    const val VERSION = "@VER@"
-
-    val PLUS_ICON = SVG("/assets/textreplacer/icons/plus.svg")
-    val MINUS_ICON = SVG("/assets/textreplacer/icons/minus.svg")
-
-    private var cachedUsername: String? = null
-    private var cachedServerIp: String? = null
-    private var cachedServerDomain: String? = null
-
-    @Mod.EventHandler
-    fun onInit(event: FMLInitializationEvent) {
-        TextReplacerConfig.initialize()
-        CommandManager.INSTANCE.registerCommand(TextReplacerCommand())
+class TextReplacer : ModInitializer {
+    override fun onInitialize() {
+        ModConfig.preload()
     }
 
-    @JvmStatic
-    fun getString(input: String): String {
-        var shouldExpand = false
+    companion object {
+        private var cachedUsername: String? = null
+        private var cachedServerIp: String? = null
+        private var cachedServerDomain: String? = null
 
-        val currentUsername = mc.session.profile.name
-        if (currentUsername != cachedUsername) {
+        private val mc = MinecraftClient.getInstance()
+
+        @JvmStatic
+        fun getString(input: String): String {
+            val currentUsername = mc.session.profile.name
+            val currentServerIp = mc.currentServerEntry?.address
+
+            val shouldExpand = currentUsername != cachedUsername || currentServerIp != cachedServerIp
             cachedUsername = currentUsername
-            shouldExpand = true
-        }
 
-        val currentServerIp = mc.currentServerData?.serverIP
-        if (currentServerIp != cachedServerIp) {
-            cachedServerIp = currentServerIp
-            cachedServerDomain = currentServerIp?.let { ip ->
-                val baseAddress = ip.split(":").first()
-                baseAddress.takeIf {
-                    !InetAddressUtils.isIPv4Address(it) && !InetAddressUtils.isIPv6Address(it)
-                }?.split(".")?.dropLast(1)?.last()
+            if (currentServerIp != cachedServerIp) {
+                cachedServerIp = currentServerIp
+                cachedServerDomain = currentServerIp
+                    ?.substringBefore(":")
+                    ?.takeUnless { InetAddressUtils.isIPv4Address(it) || InetAddressUtils.isIPv6Address(it) }
+                    ?.substringBeforeLast(".", missingDelimiterValue = "")
+                    ?.substringAfterLast(".")
             }
-            shouldExpand = true
-        }
 
-        return ReplacerListOption.wrappedReplacers.fold(input) { string, wrapper ->
-            with(wrapper.replacer) {
-                if (!enabled || text.isEmpty() || replacementText.isEmpty()) return@with string
+            return ModConfig.replacements.fold(input) { string, wrapper ->
+                if (!wrapper.enabled || wrapper.target.isEmpty() || wrapper.replacement.isEmpty()) {
+                    return@fold string
+                }
 
-                if (shouldExpand || expandedText.isEmpty())
-                    expandedText = expandText(text)
-                if (shouldExpand || expandedReplacementText.isEmpty())
-                    expandedReplacementText = expandText(replacementText)
+                if (shouldExpand || wrapper.expandedTarget.isEmpty()) {
+                    wrapper.expandedTarget = expandText(wrapper.target)
+                }
+                if (shouldExpand || wrapper.expandedReplacement.isEmpty()) {
+                    wrapper.expandedReplacement = expandText(wrapper.replacement)
+                }
 
-                string.replace(expandedText, expandedReplacementText)
+                string.replace(wrapper.expandedTarget, wrapper.expandedReplacement)
             }
         }
-    }
 
-    fun expandText(input: String): String {
-        if (input.isEmpty() || !input.contains('¶')) return input
+        fun expandText(input: String): String {
+            if ('¶' !in input) return input
 
-        val variables = mapOf(
-            "¶username" to cachedUsername,
-            "¶serverIp" to cachedServerIp?.split(":")?.firstOrNull(),
-            "¶serverDomain" to cachedServerDomain,
-            // hypixel, for some reason, puts 🎂 in their scoreboard IP
-            "¶hypixelScoreboardIp" to "www.hypixel.ne\uD83C\uDF82§et"
-        )
+            val variables = mapOf(
+                "¶username" to cachedUsername,
+                "¶serverIp" to cachedServerIp?.split(":")?.firstOrNull(),
+                "¶serverDomain" to cachedServerDomain,
+                // hypixel adds 'invisible' emojis in the scoreboard, so we have to hardcode the scoreboard ip
+                "¶hypixelScoreboardIp" to "www.hypixel.ne\uD83C\uDF82§et"
+            )
 
-        return variables.entries.fold(input) { text, (variable, value) ->
-            if (value != null) text.replace(variable, value.toString()) else text
-        }
-    }
-
-    @Command(value = MODID, description = "Access the $NAME GUI.")
-    class TextReplacerCommand {
-        @Main
-        fun handle() {
-            TextReplacerConfig.openGui()
+            return variables.entries.fold(input) { text, (variable, value) ->
+                if (value != null) text.replace(variable, value) else text
+            }
         }
     }
 }
