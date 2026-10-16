@@ -1,10 +1,9 @@
 package dev.cxntered.textreplacer.config
 
-import org.polyfrost.oneconfig.api.config.v1.annotations.Button
 import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 
-class ReplacementConfig(private val onDelete: (ReplacementConfig) -> Unit) {
+class ReplacementConfig {
     @Include
     var enabled = true
 
@@ -16,7 +15,4 @@ class ReplacementConfig(private val onDelete: (ReplacementConfig) -> Unit) {
 
     var expandedTarget = ""
     var expandedReplacement = ""
-
-    @Button(title = "Delete Replacement", description = "Delete this replacement.", text = "Delete")
-    fun delete() = onDelete(this)
 }

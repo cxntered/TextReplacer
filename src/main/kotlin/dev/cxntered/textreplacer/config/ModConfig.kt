@@ -4,6 +4,8 @@ import dev.cxntered.textreplacer.TextReplacer
 import org.polyfrost.oneconfig.api.config.v1.Config
 import org.polyfrost.oneconfig.api.config.v1.ConfigManager
 import org.polyfrost.oneconfig.api.config.v1.Node
+import org.polyfrost.oneconfig.api.config.v1.Properties
+import org.polyfrost.oneconfig.api.config.v1.Property
 import org.polyfrost.oneconfig.api.config.v1.Tree
 import org.polyfrost.oneconfig.api.config.v1.annotations.Button
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
@@ -52,10 +54,10 @@ object ModConfig : Config(
         category = "Replacements"
     )
     fun addReplacement() {
-        replacements.add(ReplacementConfig(::deleteReplacement))
+        replacements.add(ReplacementConfig())
         generateAccordions(expandedIndex = replacements.lastIndex)
         save()
-        refreshUI()
+        refreshUi()
     }
 
     @Suppress("UnstableApiUsage")
@@ -98,6 +100,8 @@ object ModConfig : Config(
             )
             collector.handle(accordion, replacement, 0)
 
+            accordion.put(actionsProperty(index))
+
             listOf("target", "replacement").forEach {
                 accordion.getProp(it).addCallback {
                     replacement.expandedTarget = TextReplacer.expandText(replacement.target)
@@ -114,6 +118,15 @@ object ModConfig : Config(
         }
     }
 
+    private fun actionsProperty(index: Int): Property<Void> {
+        val actions = Properties.dummy("actions", "Actions", "Manage this replacement.")
+        actions.addMetadata("visualizer", ReplacementActionsVisualizer)
+        if (index > 0) actions.addMetadata("moveUp", { moveReplacement(index, index - 1) })
+        if (index < replacements.lastIndex) actions.addMetadata("moveDown", { moveReplacement(index, index + 1) })
+        actions.addMetadata("delete", { deleteReplacement(index) })
+        return actions
+    }
+
     private fun getReplacementDescription(replacement: ReplacementConfig): String {
         return if (replacement.target.isBlank() && replacement.replacement.isBlank()) {
             "Empty replacement (expand to edit)"
@@ -124,20 +137,27 @@ object ModConfig : Config(
         }
     }
 
-    private fun Tree.toReplacementConfig() = ReplacementConfig(::deleteReplacement).apply {
+    private fun Tree.toReplacementConfig() = ReplacementConfig().apply {
         (getProp("enabled")?.get() as? Boolean)?.let { enabled = it }
         (getProp("target")?.get() as? String)?.let { target = it }
         (getProp("replacement")?.get() as? String)?.let { replacement = it }
     }
 
-    private fun deleteReplacement(replacement: ReplacementConfig) {
-        replacements.remove(replacement)
-        generateAccordions()
+    private fun moveReplacement(from: Int, to: Int) {
+        replacements.add(to, replacements.removeAt(from))
+        generateAccordions(expandedIndex = to)
         save()
-        refreshUI()
+        refreshUi()
     }
 
-    private fun refreshUI() {
+    private fun deleteReplacement(index: Int) {
+        replacements.removeAt(index)
+        generateAccordions()
+        save()
+        refreshUi()
+    }
+
+    private fun refreshUi() {
         Platform.screen().runOnUiThread {
             try {
                 tree ?: return@runOnUiThread

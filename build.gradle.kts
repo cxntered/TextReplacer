@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.fabric.loom)
     alias(libs.plugins.ploceus)
     alias(libs.plugins.mod.publish)
