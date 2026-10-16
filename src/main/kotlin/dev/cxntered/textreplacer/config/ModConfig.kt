@@ -120,7 +120,7 @@ object ModConfig : Config(
         } else {
             val targetDesc = replacement.target.ifBlank { "(empty)" }
             val replacementDesc = replacement.replacement.ifBlank { "(empty)" }
-            "$targetDesc → $replacementDesc"
+            "$targetDesc §r→ $replacementDesc"
         }
     }
 
