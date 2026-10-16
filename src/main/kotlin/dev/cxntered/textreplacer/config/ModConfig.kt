@@ -14,6 +14,7 @@ import org.polyfrost.oneconfig.api.platform.v1.Platform
 import org.polyfrost.oneconfig.internal.ui.api.ConfigRegistry
 import org.polyfrost.oneconfig.internal.ui.api.ConfigSource
 import org.polyfrost.oneconfig.utils.v1.ClipboardHelper
+import java.util.concurrent.CopyOnWriteArrayList
 
 @Suppress("unused")
 object ModConfig : Config(
@@ -23,7 +24,8 @@ object ModConfig : Config(
     Category.UTILITY
 ) {
     private const val REPLACEMENT_PREFIX = "replacement_"
-    val replacements = mutableListOf<ReplacementConfig>()
+    private val theMapField by lazy { Tree::class.java.getDeclaredField("theMap").apply { isAccessible = true } }
+    val replacements = CopyOnWriteArrayList<ReplacementConfig>()
 
     @JvmStatic
     @Switch(title = "Enabled", description = "Enable or disable the mod.")
@@ -81,8 +83,7 @@ object ModConfig : Config(
         val root = target ?: return
 
         // remove existing replacement accordions
-        val field = Tree::class.java.getDeclaredField("theMap").apply { isAccessible = true }
-        (field.get(root) as MutableMap<String, Node>).keys.removeIf { it.startsWith(REPLACEMENT_PREFIX) }
+        (theMapField.get(root) as MutableMap<String, Node>).keys.removeIf { it.startsWith(REPLACEMENT_PREFIX) }
 
         // add new accordion for each replacement
         val collector = OneConfigCollector()

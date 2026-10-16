@@ -15,4 +15,5 @@ class ReplacementConfig {
 
     var expandedTarget = ""
     var expandedReplacement = ""
+    var expansionDirty = true
 }

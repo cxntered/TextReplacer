@@ -15,35 +15,40 @@ class TextReplacer : ModInitializer {
         private var cachedServerIp: String? = null
         private var cachedServerDomain: String? = null
 
-        private val mc = MinecraftClient.getInstance()
-
         @JvmStatic
         fun getString(input: String): String {
+            val mc = MinecraftClient.getInstance()
             val currentUsername = mc.session.profile.name
             val currentServerIp = mc.currentServerEntry?.address
 
-            val shouldExpand = currentUsername != cachedUsername || currentServerIp != cachedServerIp
-            cachedUsername = currentUsername
+            val usernameChanged = currentUsername != cachedUsername
+            val serverIpChanged = currentServerIp != cachedServerIp
 
-            if (currentServerIp != cachedServerIp) {
+            if (serverIpChanged) {
                 cachedServerIp = currentServerIp
                 cachedServerDomain = currentServerIp
-                    ?.substringBefore(":")
                     ?.takeUnless { InetAddressUtils.isIPv4Address(it) || InetAddressUtils.isIPv6Address(it) }
+                    ?.substringBefore(":")
                     ?.substringBeforeLast(".", missingDelimiterValue = "")
                     ?.substringAfterLast(".")
             }
+
+            if (usernameChanged || serverIpChanged) ModConfig.replacements.forEach { it.expansionDirty = true }
+            cachedUsername = currentUsername
 
             return ModConfig.replacements.fold(input) { string, wrapper ->
                 if (!wrapper.enabled || wrapper.target.isEmpty() || wrapper.replacement.isEmpty()) {
                     return@fold string
                 }
 
-                if (shouldExpand || wrapper.expandedTarget.isEmpty()) {
+                if (wrapper.expansionDirty) {
                     wrapper.expandedTarget = expandText(wrapper.target)
-                }
-                if (shouldExpand || wrapper.expandedReplacement.isEmpty()) {
                     wrapper.expandedReplacement = expandText(wrapper.replacement)
+                    wrapper.expansionDirty = false
+                }
+
+                if (wrapper.expandedTarget.isEmpty() || wrapper.expandedReplacement.isEmpty()) {
+                    return@fold string
                 }
 
                 string.replace(wrapper.expandedTarget, wrapper.expandedReplacement)
@@ -55,7 +60,7 @@ class TextReplacer : ModInitializer {
 
             val variables = mapOf(
                 "¶username" to cachedUsername,
-                "¶serverIp" to cachedServerIp?.split(":")?.firstOrNull(),
+                "¶serverIp" to cachedServerIp?.substringBefore(":"),
                 "¶serverDomain" to cachedServerDomain,
                 // hypixel adds 'invisible' emojis in the scoreboard, so we have to hardcode the scoreboard ip
                 "¶hypixelScoreboardIp" to "www.hypixel.ne\uD83C\uDF82§et"
