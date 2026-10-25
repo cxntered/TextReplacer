@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalOneConfigUiApi::class)
+
 package dev.cxntered.textreplacer.config
 
 import androidx.compose.foundation.layout.Arrangement
@@ -14,16 +16,17 @@ import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
-import org.polyfrost.oneconfig.internal.ui.api.Tooltip
-import org.polyfrost.oneconfig.internal.ui.components.Icon
-import org.polyfrost.oneconfig.internal.ui.components.IconButton
-import org.polyfrost.oneconfig.internal.ui.components.Text
-import org.polyfrost.oneconfig.internal.ui.themes.LocalTheme
+import org.polyfrost.oneconfig.api.ui.v1.ExperimentalOneConfigUiApi
+import org.polyfrost.oneconfig.api.ui.v1.components.Icon
+import org.polyfrost.oneconfig.api.ui.v1.components.IconButton
+import org.polyfrost.oneconfig.api.ui.v1.components.Text
+import org.polyfrost.oneconfig.api.ui.v1.components.Tooltip
+import org.polyfrost.oneconfig.api.ui.v1.theme.OneConfigTheme
 
 private val DeleteColor = Color(0xFFE5484D)
 
 val ReplacementActionsVisualizer = Visualizer { prop ->
-    val theme = LocalTheme.current
+    val theme = OneConfigTheme.current
     val moveColor = theme.textColor.copy(alpha = 0.7f)
     Row(
         modifier = Modifier.padding(vertical = 8.dp),
@@ -64,10 +67,10 @@ private fun ActionIcon(
     tooltip: String,
     rotation: Float = 0f,
 ) {
-    val theme = LocalTheme.current
+    val theme = OneConfigTheme.current
     val modifier = Modifier.size(20.dp).rotate(rotation)
     Tooltip(
-        text = { Text(tooltip, color = theme.textColor, fontSize = 12.sp) },
+        text = { Text(tooltip, color = theme.textColor, fontSize = 12.sp, modifier = Modifier) },
         modifier = Modifier,
         anchor = Alignment.TopCenter,
     ) {
@@ -77,6 +80,8 @@ private fun ActionIcon(
                 foreground = color,
                 hoveredForeground = hoverColor,
                 onClick = action,
+                enabled = true,
+                hoverBorder = false,
                 modifier = modifier.pointerHoverIcon(PointerIcon.Hand)
             )
         } else {
