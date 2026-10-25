@@ -62,7 +62,6 @@ object ModConfig : Config(
         refreshUi()
     }
 
-    @Suppress("UnstableApiUsage")
     override fun makeTree(): Tree {
         val tree = super.makeTree()
 

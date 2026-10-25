@@ -17,6 +17,7 @@ repositories {
     maven("https://maven.legacyfabric.net/")
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
     maven("https://repo.polyfrost.org/releases")
+    maven("https://redirector.kotlinlang.org/maven/compose-dev")
     maven("https://maven.cloverclient.com/releases")
 }
 
