@@ -29,7 +29,7 @@ val ReplacementActionsVisualizer = Visualizer { prop ->
     val theme = OneConfigTheme.current
     val moveColor = theme.textColor.copy(alpha = 0.7f)
     Row(
-        modifier = Modifier.padding(vertical = 8.dp),
+        modifier = Modifier.padding(vertical = 6.dp).padding(end = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

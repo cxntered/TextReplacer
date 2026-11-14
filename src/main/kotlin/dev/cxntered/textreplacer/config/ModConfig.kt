@@ -125,7 +125,7 @@ object ModConfig : Config(
     }
 
     private fun actionsProperty(index: Int): Property<Void> {
-        val actions = Properties.dummy("actions", "Actions", "Manage this replacement.")
+        val actions = Properties.dummy("actions", "\u00A0", "Manage this replacement.")
         actions.addMetadata("visualizer", ReplacementActionsVisualizer)
         if (index > 0) actions.addMetadata("moveUp", { moveReplacement(index, index - 1) })
         if (index < replacements.lastIndex) actions.addMetadata("moveDown", { moveReplacement(index, index + 1) })
