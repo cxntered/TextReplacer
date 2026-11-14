@@ -141,6 +141,9 @@ object ModConfig : Config(
         (getProp("enabled")?.get() as? Boolean)?.let { enabled = it }
         (getProp("target")?.get() as? String)?.let { target = it }
         (getProp("replacement")?.get() as? String)?.let { replacement = it }
+        (getProp("matchFilters")?.get() as? List<*>)?.let { saved ->
+            matchFilters = BooleanArray(matchFilters.size) { saved.getOrNull(it) == true }
+        }
     }
 
     private fun moveReplacement(from: Int, to: Int) {

@@ -1,6 +1,7 @@
 package dev.cxntered.textreplacer
 
 import dev.cxntered.textreplacer.config.ModConfig
+import dev.cxntered.textreplacer.match.FilteringReplacer
 import net.fabricmc.api.ModInitializer
 import net.minecraft.client.MinecraftClient
 import org.apache.http.conn.util.InetAddressUtils
@@ -36,22 +37,28 @@ class TextReplacer : ModInitializer {
             if (usernameChanged || serverIpChanged) ModConfig.replacements.forEach { it.expansionDirty = true }
             cachedUsername = currentUsername
 
-            return ModConfig.replacements.fold(input) { string, wrapper ->
-                if (!wrapper.enabled || wrapper.target.isEmpty() || wrapper.replacement.isEmpty()) {
-                    return@fold string
+            return ModConfig.replacements.fold(input) { text, entry ->
+                if (!entry.enabled || entry.target.isEmpty() || entry.replacement.isEmpty()) {
+                    return@fold text
                 }
 
-                if (wrapper.expansionDirty) {
-                    wrapper.expandedTarget = expandText(wrapper.target)
-                    wrapper.expandedReplacement = expandText(wrapper.replacement)
-                    wrapper.expansionDirty = false
+                if (entry.expansionDirty) {
+                    entry.expandedTarget = expandText(entry.target)
+                    entry.expandedReplacement = expandText(entry.replacement)
+                    entry.expansionDirty = false
                 }
 
-                if (wrapper.expandedTarget.isEmpty() || wrapper.expandedReplacement.isEmpty()) {
-                    return@fold string
+                if (entry.expandedTarget.isEmpty() || entry.expandedReplacement.isEmpty()) {
+                    return@fold text
                 }
 
-                string.replace(wrapper.expandedTarget, wrapper.expandedReplacement)
+                FilteringReplacer.replace(
+                    text,
+                    entry.expandedTarget,
+                    entry.expandedReplacement,
+                    entry.ignoreFormattingCodes,
+                    entry.ignoreInvalidCharacters
+                )
             }
         }
 
