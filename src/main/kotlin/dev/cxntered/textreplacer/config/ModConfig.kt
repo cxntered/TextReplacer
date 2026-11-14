@@ -49,6 +49,14 @@ object ModConfig : Config(
         ClipboardHelper.setString("¶")
     }
 
+    @Switch(
+        title = "Allow Empty Replacements",
+        description = "Allow empty replacements to delete targeted text instead of being ignored.",
+        category = "General",
+        subcategory = "Advanced"
+    )
+    var allowEmptyReplacements = false
+
     @Button(
         title = "Add Replacement",
         description = "Add a new replacement.",
@@ -104,15 +112,13 @@ object ModConfig : Config(
 
             listOf("target", "replacement").forEach {
                 accordion.getProp(it).addCallback {
-                    replacement.expandedTarget = TextReplacer.expandText(replacement.target)
-                    replacement.expandedReplacement = TextReplacer.expandText(replacement.replacement)
+                    replacement.refreshExpandedText()
                     accordion.description = getReplacementDescription(replacement)
                     false
                 }
             }
 
-            replacement.expandedTarget = TextReplacer.expandText(replacement.target)
-            replacement.expandedReplacement = TextReplacer.expandText(replacement.replacement)
+            replacement.refreshExpandedText()
 
             root.put(accordion)
         }
@@ -127,12 +133,21 @@ object ModConfig : Config(
         return actions
     }
 
+    private fun ReplacementConfig.refreshExpandedText() {
+        expandedTarget = TextReplacer.expandText(target)
+        expandedReplacement = TextReplacer.expandText(replacement)
+    }
+
     private fun getReplacementDescription(replacement: ReplacementConfig): String {
         return if (replacement.target.isBlank() && replacement.replacement.isBlank()) {
             "Empty replacement (expand to edit)"
         } else {
             val targetDesc = replacement.target.ifBlank { "(empty)" }
-            val replacementDesc = replacement.replacement.ifBlank { "(empty)" }
+            val replacementDesc = when {
+                replacement.replacement.isNotEmpty() -> replacement.replacement
+                allowEmptyReplacements -> "(removed)"
+                else -> "(empty)"
+            }
             "$targetDesc §r→ $replacementDesc"
         }
     }

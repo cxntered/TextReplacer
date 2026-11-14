@@ -38,9 +38,7 @@ class TextReplacer : ModInitializer {
             cachedUsername = currentUsername
 
             return ModConfig.replacements.fold(input) { text, entry ->
-                if (!entry.enabled || entry.target.isEmpty() || entry.replacement.isEmpty()) {
-                    return@fold text
-                }
+                if (!entry.enabled || entry.target.isEmpty()) return@fold text
 
                 if (entry.expansionDirty) {
                     entry.expandedTarget = expandText(entry.target)
@@ -48,9 +46,8 @@ class TextReplacer : ModInitializer {
                     entry.expansionDirty = false
                 }
 
-                if (entry.expandedTarget.isEmpty() || entry.expandedReplacement.isEmpty()) {
-                    return@fold text
-                }
+                if (entry.expandedTarget.isEmpty()) return@fold text
+                if (entry.expandedReplacement.isEmpty() && !ModConfig.allowEmptyReplacements) return@fold text
 
                 FilteringReplacer.replace(
                     text,
