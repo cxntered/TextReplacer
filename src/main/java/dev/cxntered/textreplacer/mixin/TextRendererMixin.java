@@ -13,13 +13,13 @@ abstract class TextRendererMixin {
     private String spoofDrawLayer(String string) {
         if (string == null) return null;
         if (!ModConfig.isEnabled()) return string;
-        return TextReplacer.getString(string);
+        return TextReplacer.getString(string, (TextRenderer) (Object) this);
     }
 
     @ModifyVariable(method = "getStringWidth", at = @At("HEAD"), argsOnly = true)
     private String spoofGetStringWidth(String string) {
         if (string == null) return null;
         if (!ModConfig.isEnabled()) return string;
-        return TextReplacer.getString(string);
+        return TextReplacer.getString(string, (TextRenderer) (Object) this);
     }
 }

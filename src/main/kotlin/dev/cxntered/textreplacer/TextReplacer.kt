@@ -4,6 +4,7 @@ import dev.cxntered.textreplacer.config.ModConfig
 import dev.cxntered.textreplacer.match.FilteringReplacer
 import net.fabricmc.api.ModInitializer
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.font.TextRenderer
 import org.apache.http.conn.util.InetAddressUtils
 
 class TextReplacer : ModInitializer {
@@ -17,7 +18,7 @@ class TextReplacer : ModInitializer {
         private var cachedServerDomain: String? = null
 
         @JvmStatic
-        fun getString(input: String): String {
+        fun getString(input: String, textRenderer: TextRenderer): String {
             val mc = MinecraftClient.getInstance()
             val currentUsername = mc.session.profile.name
             val currentServerIp = mc.currentServerEntry?.address
@@ -54,7 +55,8 @@ class TextReplacer : ModInitializer {
                     entry.expandedTarget,
                     entry.expandedReplacement,
                     entry.ignoreFormattingCodes,
-                    entry.ignoreInvalidCharacters
+                    entry.ignoreInvalidCharacters,
+                    textRenderer
                 )
             }
         }

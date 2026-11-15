@@ -1,5 +1,7 @@
 package dev.cxntered.textreplacer.match
 
+import net.minecraft.client.font.TextRenderer
+
 internal object FilteringReplacer {
     private const val FORMATTING_CODE = '§'
 
@@ -9,7 +11,8 @@ internal object FilteringReplacer {
         target: String,
         replacement: String,
         ignoreFormattingCodes: Boolean,
-        ignoreInvalidCharacters: Boolean
+        ignoreInvalidCharacters: Boolean,
+        textRenderer: TextRenderer
     ): String {
         if (!ignoreFormattingCodes && !ignoreInvalidCharacters) return text.replace(target, replacement)
 
@@ -18,7 +21,7 @@ internal object FilteringReplacer {
             return when {
                 ignoreFormattingCodes && index + 1 < source.length &&
                         source[index] == FORMATTING_CODE && isFormattingCode(source[index + 1]) -> 2
-                ignoreInvalidCharacters && isInvalidCharacter(source[index]) -> 1
+                ignoreInvalidCharacters && isInvalidCharacter(source[index], textRenderer) -> 1
                 else -> 0
             }
         }
@@ -84,11 +87,7 @@ internal object FilteringReplacer {
         return lower in '0'..'9' || lower in 'a'..'f' || lower in 'k'..'o' || lower == 'r'
     }
 
-    private fun isInvalidCharacter(char: Char): Boolean = when (char.category) {
-        CharCategory.FORMAT,
-        CharCategory.SURROGATE,
-        CharCategory.PRIVATE_USE,
-        CharCategory.UNASSIGNED -> true
-        else -> false
-    }
+    // a char without a glyph in the font has a width of 0
+    private fun isInvalidCharacter(char: Char, textRenderer: TextRenderer) =
+        char.code >= 0x80 && textRenderer.getCharWidth(char) == 0
 }
