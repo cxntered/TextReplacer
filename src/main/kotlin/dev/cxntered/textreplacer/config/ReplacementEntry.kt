@@ -4,7 +4,7 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.MultiSelectDropdown
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 
-class ReplacementConfig {
+class ReplacementEntry {
     @Include
     var enabled = true
 

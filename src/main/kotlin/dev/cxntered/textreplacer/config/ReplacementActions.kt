@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.polyfrost.oneconfig.api.config.v1.Visualizer
 import org.polyfrost.oneconfig.api.ui.v1.ExperimentalOneConfigUiApi
+import org.polyfrost.oneconfig.api.ui.v1.components.Confirm
 import org.polyfrost.oneconfig.api.ui.v1.components.ControlSize
 import org.polyfrost.oneconfig.api.ui.v1.components.IconButton
 import org.polyfrost.oneconfig.api.ui.v1.theme.OneConfigTheme
@@ -20,6 +21,7 @@ val ReplacementActionsVisualizer = Visualizer { prop ->
     val moveUp = prop.getMetadata<() -> Unit>("moveUp")
     val moveDown = prop.getMetadata<() -> Unit>("moveDown")
     val delete = prop.getMetadata<() -> Unit>("delete")
+    val isEmpty = prop.getMetadata<() -> Boolean>("isEmpty")?.invoke() == true
 
     Row(
         modifier = Modifier.padding(end = 4.dp),
@@ -35,7 +37,17 @@ val ReplacementActionsVisualizer = Visualizer { prop ->
             danger = true,
             tint = OneConfigTheme.current.error,
         ) {
-            delete?.invoke()
+            if (isEmpty) {
+                delete?.invoke()
+            } else {
+                Confirm.ask(
+                    title = "Delete Replacement",
+                    text = "Are you sure you want to delete this replacement?",
+                    confirmLabel = "Delete",
+                    onConfirm = { delete?.invoke() },
+                    icon = "trash",
+                )
+            }
         }
     }
 }

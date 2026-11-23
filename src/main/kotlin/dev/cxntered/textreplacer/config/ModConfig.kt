@@ -25,7 +25,7 @@ object ModConfig : Config(
 ) {
     private const val REPLACEMENT_PREFIX = "replacement_"
     private val theMapField by lazy { Tree::class.java.getDeclaredField("theMap").apply { isAccessible = true } }
-    val replacements = CopyOnWriteArrayList<ReplacementConfig>()
+    val replacements = CopyOnWriteArrayList<ReplacementEntry>()
 
     @JvmStatic
     @Switch(title = "Enabled", description = "Enable or disable the mod.")
@@ -64,7 +64,7 @@ object ModConfig : Config(
         category = "Replacements"
     )
     fun addReplacement() {
-        replacements.add(ReplacementConfig())
+        replacements.add(ReplacementEntry())
         generateAccordions(expandedIndex = replacements.lastIndex)
         save()
         refreshUi()
@@ -78,7 +78,7 @@ object ModConfig : Config(
             saved.entries
                 .filter { it.key.startsWith(REPLACEMENT_PREFIX) }
                 .sortedBy { it.key.removePrefix(REPLACEMENT_PREFIX).toIntOrNull() ?: Int.MAX_VALUE }
-                .mapNotNullTo(replacements) { (_, value) -> (value as? Tree)?.toReplacementConfig() }
+                .mapNotNullTo(replacements) { (_, value) -> (value as? Tree)?.toReplacementEntry() }
         }
 
         generateAccordions(tree)
@@ -94,57 +94,58 @@ object ModConfig : Config(
 
         // add new accordion for each replacement
         val collector = OneConfigCollector()
-        replacements.forEachIndexed { index, replacement ->
+        replacements.forEachIndexed { index, entry ->
             val accordion = Tree.tree("$REPLACEMENT_PREFIX$index")
             accordion.addMetadata(
                 mapOf(
                     "title" to "Replacement #${index + 1}",
-                    "description" to getReplacementDescription(replacement),
+                    "description" to getReplacementDescription(entry),
                     "category" to "Replacements",
                     "canBeEnabled" to true,
                     "index" to index,
                     "collapsed" to (index != expandedIndex),
                 )
             )
-            collector.handle(accordion, replacement, 0)
+            collector.handle(accordion, entry, 0)
 
-            accordion.put(actionsProperty(index))
+            accordion.put(actionsProperty(index, entry))
 
             listOf("target", "replacement").forEach {
                 accordion.getProp(it).addCallback {
-                    replacement.refreshExpandedText()
-                    accordion.description = getReplacementDescription(replacement)
+                    entry.refreshExpandedText()
+                    accordion.description = getReplacementDescription(entry)
                     false
                 }
             }
 
-            replacement.refreshExpandedText()
+            entry.refreshExpandedText()
 
             root.put(accordion)
         }
     }
 
-    private fun actionsProperty(index: Int): Property<Void> {
+    private fun actionsProperty(index: Int, entry: ReplacementEntry): Property<Void> {
         val actions = Properties.dummy("actions", "\u00A0", "Manage this replacement.")
         actions.addMetadata("visualizer", ReplacementActionsVisualizer)
         if (index > 0) actions.addMetadata("moveUp", { moveReplacement(index, index - 1) })
         if (index < replacements.lastIndex) actions.addMetadata("moveDown", { moveReplacement(index, index + 1) })
         actions.addMetadata("delete", { deleteReplacement(index) })
+        actions.addMetadata("isEmpty", { entry.target.isBlank() && entry.replacement.isBlank() })
         return actions
     }
 
-    private fun ReplacementConfig.refreshExpandedText() {
+    private fun ReplacementEntry.refreshExpandedText() {
         expandedTarget = TextReplacer.expandText(target)
         expandedReplacement = TextReplacer.expandText(replacement)
     }
 
-    private fun getReplacementDescription(replacement: ReplacementConfig): String {
-        return if (replacement.target.isBlank() && replacement.replacement.isBlank()) {
+    private fun getReplacementDescription(entry: ReplacementEntry): String {
+        return if (entry.target.isBlank() && entry.replacement.isBlank()) {
             "Empty replacement (expand to edit)"
         } else {
-            val targetDesc = replacement.target.ifBlank { "(empty)" }
+            val targetDesc = entry.target.ifBlank { "(empty)" }
             val replacementDesc = when {
-                replacement.replacement.isNotEmpty() -> replacement.replacement
+                entry.replacement.isNotEmpty() -> entry.replacement
                 allowEmptyReplacements -> "(removed)"
                 else -> "(empty)"
             }
@@ -152,7 +153,7 @@ object ModConfig : Config(
         }
     }
 
-    private fun Tree.toReplacementConfig() = ReplacementConfig().apply {
+    private fun Tree.toReplacementEntry() = ReplacementEntry().apply {
         (getProp("enabled")?.get() as? Boolean)?.let { enabled = it }
         (getProp("target")?.get() as? String)?.let { target = it }
         (getProp("replacement")?.get() as? String)?.let { replacement = it }
