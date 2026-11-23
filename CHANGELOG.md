@@ -1,7 +1,6 @@
 ## Changelog
 
-- Add match filters to replacements
-  - Allows ignoring formatting codes and invalid characters when matching text
-  - Invalid characters are those that do not render, commonly found in scoreboards like on Hypixel
-- Add "Allow Empty Replacements" setting
-  - When enabled, empty replacements will delete the targeted text instead of being ignored
+- Update to OneConfig 1.9.0
+- Fix compatibility with [VanillaHUD](https://modrinth.com/mod/vanillahud) 3.5.11 and above
+- Update replacement actions UI to fit more with OneConfig's design
+- Add a replacement deletion confirmation dialog
