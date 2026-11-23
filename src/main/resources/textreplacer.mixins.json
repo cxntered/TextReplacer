@@ -3,6 +3,7 @@
   "package": "dev.cxntered.textreplacer.mixin",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "compat.HudCaptureMixin_VanillaHUD",
     "TextRendererMixin"
   ],
   "injectors": {

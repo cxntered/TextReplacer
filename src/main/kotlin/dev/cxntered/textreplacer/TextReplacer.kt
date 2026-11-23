@@ -18,7 +18,7 @@ class TextReplacer : ModInitializer {
         private var cachedServerDomain: String? = null
 
         @JvmStatic
-        fun getString(input: String, textRenderer: TextRenderer): String {
+        fun getString(input: String): String {
             val mc = MinecraftClient.getInstance()
             val currentUsername = mc.session.profile.name
             val currentServerIp = mc.currentServerEntry?.address
@@ -56,7 +56,7 @@ class TextReplacer : ModInitializer {
                     entry.expandedReplacement,
                     entry.ignoreFormattingCodes,
                     entry.ignoreInvalidCharacters,
-                    textRenderer
+                    mc.textRenderer
                 )
             }
         }
